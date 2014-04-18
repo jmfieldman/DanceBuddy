@@ -11,6 +11,7 @@
 
 static float s_tilt = 0;
 static float s_ext  = 0;
+static float s_rad  = 0;
 
 @implementation DanceSceneView
 
@@ -68,6 +69,8 @@ static float s_ext  = 0;
 		glLoadIdentity();		
 		
 		UIPanGestureRecognizer *gest = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panGest:)];
+		gest.minimumNumberOfTouches = 1;
+		gest.maximumNumberOfTouches = 2;
 		[self addGestureRecognizer:gest];
 	}
 	return self;
@@ -77,7 +80,11 @@ static float s_ext  = 0;
 	CGPoint movement = [gest translationInView:self];
 	[gest setTranslation:CGPointZero inView:self];
 	
-	s_tilt += movement.x / 100;
+	if (gest.numberOfTouches == 1) {
+		s_tilt += movement.x / 100;
+	} else {
+		s_rad += movement.x / 100;
+	}
 	s_ext  -= movement.y / 100;
 	
 	if (s_tilt < 0) s_tilt = 0; if (s_tilt > 1) s_tilt = 1;
@@ -125,7 +132,7 @@ static float s_ext  = 0;
 	
 	/* ------- Drawing -------- */
 	
-	[[SquishyBody sharedInstance] renderWithTilt:s_tilt extenstion:s_ext];
+	[[SquishyBody sharedInstance] renderWithTilt:s_tilt extension:s_ext rotation:s_rad];
 	
 	/* ------------------------ */
 	

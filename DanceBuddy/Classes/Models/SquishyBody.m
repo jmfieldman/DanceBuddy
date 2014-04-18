@@ -16,12 +16,14 @@ SINGLETON_IMPL(SquishyBody);
 	if ((self = [super init])) {
 
 		_baseRadius    = 1.0;
-		_neckRadius    = 1.0;
+		_neckRadius    = 0.9;
 		_pivotHeight   = 0.5;
 		_maxNeckTilt   = 20 * M_PI / 180.0;
 		_minNeckExt    = 0.5;
 		_maxNeckExt    = 0.75;
-		_bodyArcLength = 2.5;
+		_bodyArcArea   = 0.06;
+		_headRadius    = 1.06;
+		_headOffset    = 0.48;
 		
 		[self generateBodyData];
 		
@@ -46,12 +48,12 @@ SINGLETON_IMPL(SquishyBody);
 	if (alt < altitude) alt = altitude;
 	return alt;
 	#endif
-	
+
 	double theta = M_PI / 4;
 	double diff  = M_PI / 8;
-	double areaTarget = 0.055;
+	double areaTarget = _bodyArcArea;
 	
-	while (diff > (0.000001)) {
+	while (diff > (0.0001)) {
 		double radius = altitude / sin(theta);
 		double area = 0.5 * radius * ( radius * theta - cos(theta) * altitude );
 		if (area > areaTarget) theta -= diff; else theta += diff;
@@ -65,13 +67,13 @@ SINGLETON_IMPL(SquishyBody);
 
 - (void) generateBodyData {
 	
-	EXLog(OPENGL, DBG, @"Started generateBodyData [%ld verts]", (long)sizeof(vertexes));
+	EXLog(OPENGL, DBG, @"Started generateBodyData [%ld verts]", (long)sizeof(body_vertexes));
 
 			
 	for (int tilt = 0; tilt < SQB_TILT_COUNT; tilt++) {
 		
 		/* How much we're tilting */
-		GLfloat tiltRadians = _maxNeckTilt * tilt / (GLfloat)SQB_TILT_COUNT;
+		GLfloat tiltRadians = _maxNeckTilt * tilt / (GLfloat)(SQB_TILT_COUNT-1);
 		
 		/* What is the tilt vector for this tilt? */
 		GLfloat_v tiltExtensionVector = { sin(tiltRadians), 0, cos(tiltRadians) };
@@ -84,7 +86,7 @@ SINGLETON_IMPL(SquishyBody);
 			
 			for (int longitude = 0; longitude < SQB_LONGITUDES_COUNT; longitude++) {
 				
-				GLfloat longitudeRadians = M_PI * 2 * longitude / (GLfloat)SQB_LONGITUDES_COUNT;
+				GLfloat longitudeRadians = M_PI * 2 * longitude / (GLfloat)(SQB_LONGITUDES_COUNT-1);
 				
 				/* What is the tilted neck vector for this longitude? */
 				
@@ -203,10 +205,10 @@ SINGLETON_IMPL(SquishyBody);
 												   xz_mapped_point_v.x * sin(longitudeRadians) + xz_mapped_point_v.y * cos(longitudeRadians),
 												   xz_mapped_point_v.z };
 										
-					OGLVBO_Vertex_Position_Normal_Texture_t *vertex = &vertexes[ext * SQB_EXTENSION_OFFSET +
-																				tilt * SQB_TILT_OFFSET +
-																				latitude * SQB_LATITUDE_OFFSET +
-																				longitude];
+					OGLVBO_Vertex_Position_Normal_Texture_t *vertex = &body_vertexes[ext * SQB_EXTENSION_OFFSET +
+																					 tilt * SQB_TILT_OFFSET +
+																					 latitude * SQB_LATITUDE_OFFSET +
+																					 longitude];
 
 					
 					vertex->px = unmapped_point_v.x;
@@ -225,6 +227,33 @@ SINGLETON_IMPL(SquishyBody);
 		}
 	}
 	
+	
+	/* Do the head - vertexes will be unit spehere centered around 0,0,0 */
+	for (int latitude = 0; latitude < SQB_LATITUDE_COUNT; latitude++) {
+		
+		GLfloat latitudeRadians = (- M_PI / 4.0) + ((GLfloat)latitude / (SQB_LATITUDE_COUNT-1) * M_PI * 3.0 / 4.0);
+		
+		GLfloat x_map = cos(latitudeRadians);
+		GLfloat z_map = sin(latitudeRadians);
+		
+		for (int longitude = 0; longitude < SQB_LONGITUDES_COUNT; longitude++) {
+		
+			GLfloat longitudeRadians = M_PI * 2 * (GLfloat)longitude / (SQB_LONGITUDES_COUNT-1);
+			
+			OGLVBO_Vertex_Position_Normal_Texture_t *vertex = &head_vertexes[latitude * SQB_LATITUDE_OFFSET +
+																			 longitude];
+			
+			vertex->px = x_map * cos(longitudeRadians);
+			vertex->py = x_map * sin(longitudeRadians);
+			vertex->pz = z_map;
+			
+			vertex->nx = vertex->px;
+			vertex->ny = vertex->py;
+			vertex->nz = vertex->pz;
+		}
+	}
+	
+	
 	int longitude;
 	for (longitude = 0; longitude < (SQB_LATITUDE_STRIP_INDEX_COUNT/2-1); longitude ++) {
 		latitudeStrip[longitude*2]   = longitude;
@@ -236,7 +265,7 @@ SINGLETON_IMPL(SquishyBody);
 	EXLog(OPENGL, DBG, @"Finished generateBodyData");
 }
 
-- (void) renderWithTilt:(float)tilt extenstion:(float)ext {
+- (void) renderWithTilt:(float)tilt extension:(float)ext rotation:(float)radians {
 
 	static double s = 0;
 	if (s == 0) s = CFAbsoluteTimeGetCurrent();
@@ -271,20 +300,36 @@ SINGLETON_IMPL(SquishyBody);
 	
 	glPushMatrix();
 	
-	//glTranslatef(0, -2, 5);
-	//glRotatef(dif * 60, 1, 0, 0);
-	//glRotatef(-90, 1, 0, 0);
+	/* Rotate everything */
+	glRotatef(radians * 180.0 / M_PI, 0, 0, 1);
 	
-	int tilti = (int)(31 * tilt);
-	int exti  = (int)(31 * ext);
+	
+	int tilti = (int)((SQB_TILT_COUNT-1) * tilt);
+	int exti  = (int)((SQB_EXTENSION_COUNT-1) * ext);
 	
 	int tiltOffset = tilti * SQB_TILT_OFFSET;
 	int extOffset  = exti  * SQB_EXTENSION_OFFSET;
 	
+	/* Draw body */
 	for (int latitude = 0; latitude < (SQB_LATITUDE_COUNT-1); latitude++) {
 		/* Set pointers */
-		glVertexPointer(3, GL_FLOAT, sizeof(OGLVBO_Vertex_Position_Normal_Texture_t), &vertexes[latitude * SQB_LATITUDE_OFFSET + tiltOffset + extOffset].px);
-		glNormalPointer(   GL_FLOAT, sizeof(OGLVBO_Vertex_Position_Normal_Texture_t), &vertexes[latitude * SQB_LATITUDE_OFFSET + tiltOffset + extOffset].nx);
+		glVertexPointer(3, GL_FLOAT, sizeof(OGLVBO_Vertex_Position_Normal_Texture_t), &body_vertexes[latitude * SQB_LATITUDE_OFFSET + tiltOffset + extOffset].px);
+		glNormalPointer(   GL_FLOAT, sizeof(OGLVBO_Vertex_Position_Normal_Texture_t), &body_vertexes[latitude * SQB_LATITUDE_OFFSET + tiltOffset + extOffset].nx);
+		
+		glDrawElements(GL_TRIANGLE_STRIP, SQB_LATITUDE_STRIP_INDEX_COUNT, GL_UNSIGNED_INT, latitudeStrip);
+	}
+	
+	/* Transform for head */
+	glTranslatef(0, 0, _pivotHeight);
+	glRotatef((_maxNeckTilt * 180.0 / M_PI) * tilt, 0, 1, 0);
+	glTranslatef(0, 0, _minNeckExt + (_maxNeckExt - _minNeckExt) * ext + _headOffset);
+	glScalef(_headRadius, _headRadius, _headRadius);
+	
+	/* Draw head verts */
+	for (int latitude = 0; latitude < (SQB_LATITUDE_COUNT-1); latitude++) {
+		/* Set pointers */
+		glVertexPointer(3, GL_FLOAT, sizeof(OGLVBO_Vertex_Position_Normal_Texture_t), &head_vertexes[latitude * SQB_LATITUDE_OFFSET].px);
+		glNormalPointer(   GL_FLOAT, sizeof(OGLVBO_Vertex_Position_Normal_Texture_t), &head_vertexes[latitude * SQB_LATITUDE_OFFSET].nx);
 		
 		glDrawElements(GL_TRIANGLE_STRIP, SQB_LATITUDE_STRIP_INDEX_COUNT, GL_UNSIGNED_INT, latitudeStrip);
 	}

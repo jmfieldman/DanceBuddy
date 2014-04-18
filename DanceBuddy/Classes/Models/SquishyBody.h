@@ -21,7 +21,10 @@
 
 @interface SquishyBody : NSObject {
 	/* Data for the body */
-	OGLVBO_Vertex_Position_Normal_Texture_t vertexes[SQB_LONGITUDES_COUNT * SQB_LATITUDE_COUNT * SQB_TILT_COUNT * SQB_EXTENSION_COUNT];
+	OGLVBO_Vertex_Position_Normal_Texture_t body_vertexes[SQB_LONGITUDES_COUNT * SQB_LATITUDE_COUNT * SQB_TILT_COUNT * SQB_EXTENSION_COUNT];
+	
+	/* Data for the head sphere */
+	OGLVBO_Vertex_Position_Normal_Texture_t head_vertexes[SQB_LONGITUDES_COUNT * SQB_LATITUDE_COUNT];
 	
 	/* Indices for a latitude strip */
 	GLuint latitudeStrip[SQB_LATITUDE_STRIP_INDEX_COUNT];
@@ -47,11 +50,17 @@
 @property (nonatomic, assign) GLfloat maxNeckExt;
 
 /* The arc length of the body from base to neck */
-@property (nonatomic, assign) GLfloat bodyArcLength;
+@property (nonatomic, assign) GLfloat bodyArcArea;
+
+/* The radius of the head */
+@property (nonatomic, assign) GLfloat headRadius;
+
+/* The vertical offset of the head on the pivot arm */
+@property (nonatomic, assign) GLfloat headOffset;
 
 
 SINGLETON_INTR(SquishyBody);
 
-- (void) renderWithTilt:(float)tilt extenstion:(float)ext;
+- (void) renderWithTilt:(float)tilt extension:(float)ext rotation:(float)radians;
 
 @end
