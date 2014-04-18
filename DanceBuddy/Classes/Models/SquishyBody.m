@@ -17,10 +17,10 @@ SINGLETON_IMPL(SquishyBody);
 
 		_baseRadius    = 1.0;
 		_neckRadius    = 1.0;
-		_pivotHeight   = 0.5;
+		_pivotHeight   = 0.75;
 		_maxNeckTilt   = 20 * M_PI / 180.0;
 		_minNeckExt    = 0.25;
-		_maxNeckExt    = 0.75;
+		_maxNeckExt    = 2.75;
 		_bodyArcLength = 2;
 		
 		[self generateBodyData];
@@ -43,17 +43,49 @@ SINGLETON_IMPL(SquishyBody);
 	
 	EXLog(OPENGL, DBG, @"Started generateBodyData [%ld verts]", (long)sizeof(vertexes));
 
-	GLfloat_v pivotHead = { 0, 0, _pivotHeight };
-	
-		
+			
 	for (int tilt = 0; tilt < SQB_TILT_COUNT; tilt++) {
 		
+		/* How much we're tilting */
+		GLfloat tiltRadians = _maxNeckTilt * tilt / (GLfloat)SQB_TILT_COUNT;
 		
-		
+		/* What is the tilt vector for this tilt? */
+		GLfloat_v tiltExtensionVector = { sin(tiltRadians), 0, cos(tiltRadians) };
+			
 		for (int ext = 0; ext < SQB_EXTENSION_COUNT; ext++) {
-			for (int latitude = 0; latitude < SQB_LATITUDE_COUNT; latitude++) {
-				for (int longitude = 0; longitude < SQB_LONGITUDES_COUNT; longitude++) {
+			
+			/* Create the actual extension vector based on the extension length */
+			GLfloat extensionLength = _minNeckExt + (ext / (GLfloat)SQB_EXTENSION_COUNT) * (_maxNeckExt - _minNeckExt);
+			GLfloat_v trueExtensionVector = { tiltExtensionVector.x * extensionLength, 0, tiltExtensionVector.z * extensionLength };
+			
+			for (int longitude = 0; longitude < SQB_LONGITUDES_COUNT; longitude++) {
+				
+				GLfloat longitudeRadians = M_PI * 2 * longitude / (GLfloat)SQB_LONGITUDES_COUNT;
+				
+				/* What is the tilted neck vector for this longitude? */
+				
+				/* Start with the neck ring centered at the pivot height */
+				GLfloat neck_x = cos(longitudeRadians) * _neckRadius;
+				GLfloat neck_y = sin(longitudeRadians) * _neckRadius;
+				GLfloat neck_z = _pivotHeight;
+
+				/* As we rotate tilt-theta down towards +X, the only values that change are x and z coords. */
+				neck_z = neck_z + sin(-tiltRadians) * neck_x; /* Radius of our circle is neck_x */
+				neck_x = neck_x * cos(-tiltRadians);
+				
+				/* Now we add the extension vector */
+				neck_x += trueExtensionVector.x;
+				neck_y += trueExtensionVector.y;
+				neck_z += trueExtensionVector.z;
+				
+				/* Let's also get the base vector; this is easier */
+				GLfloat base_x = cos(longitudeRadians) * _baseRadius;
+				GLfloat base_y = sin(longitudeRadians) * _baseRadius;
+				GLfloat base_z = 0;
+				
+				for (int latitude = 0; latitude < SQB_LATITUDE_COUNT; latitude++) {
 					
+					#if 0
 					GLfloat xy_radian = M_PI * 2 * longitude / (GLfloat)SQB_LONGITUDES_COUNT;
 					GLfloat x_comp = cos(xy_radian);
 					GLfloat y_comp = sin(xy_radian);
@@ -62,15 +94,25 @@ SINGLETON_IMPL(SquishyBody);
 					GLfloat z_comp = sin(z_radian);
 					
 					normalize_3d_to_length(&x_comp, &y_comp, &z_comp, 1);
+					#endif
 					
-					OGLVBO_Vertex_Position_Normal_Texture_t *vertex = &vertexes[ext * SQB_EXTENTION_OFFSET +
-																				tilt * SQB_TILE_OFFSET +
+					GLfloat lat_scale = latitude / (GLfloat)SQB_LATITUDE_COUNT;
+					
+					GLfloat x_comp = base_x * lat_scale + neck_x * (1 - lat_scale);
+					GLfloat y_comp = base_y * lat_scale + neck_y * (1 - lat_scale);
+					GLfloat z_comp = base_z * lat_scale + neck_z * (1 - lat_scale);
+					
+					
+					
+					OGLVBO_Vertex_Position_Normal_Texture_t *vertex = &vertexes[ext * SQB_EXTENSION_OFFSET +
+																				tilt * SQB_TILT_OFFSET +
 																				latitude * SQB_LATITUDE_OFFSET +
 																				longitude];
 					vertex->px = x_comp;
 					vertex->py = y_comp;
 					vertex->pz = z_comp;
 					
+					normalize_3d_to_length(&x_comp, &y_comp, &z_comp, 1);
 					vertex->nx = x_comp;
 					vertex->ny = y_comp;
 					vertex->nz = z_comp;
@@ -113,13 +155,19 @@ SINGLETON_IMPL(SquishyBody);
 	
 	glPushMatrix();
 	
-	glTranslatef(0, 0, 3);
-	glRotatef(dif * 30, 1, 0, 0);
+	glTranslatef(0, 0, 5);
+	glRotatef(dif * 60, 1, 0, 0);
+	
+	int tilt = 31;
+	int ext  = 8;
+	
+	int tiltOffset = tilt * SQB_TILT_OFFSET;
+	int extOffset  = ext  * SQB_EXTENSION_OFFSET;
 	
 	for (int latitude = 0; latitude < (SQB_LATITUDE_COUNT-1); latitude++) {
 		/* Set pointers */
-		glVertexPointer(3, GL_FLOAT, sizeof(OGLVBO_Vertex_Position_Normal_Texture_t), &vertexes[latitude * SQB_LATITUDE_OFFSET].px);
-		glNormalPointer(   GL_FLOAT, sizeof(OGLVBO_Vertex_Position_Normal_Texture_t), &vertexes[latitude * SQB_LATITUDE_OFFSET].nx);
+		glVertexPointer(3, GL_FLOAT, sizeof(OGLVBO_Vertex_Position_Normal_Texture_t), &vertexes[latitude * SQB_LATITUDE_OFFSET + tiltOffset + extOffset].px);
+		glNormalPointer(   GL_FLOAT, sizeof(OGLVBO_Vertex_Position_Normal_Texture_t), &vertexes[latitude * SQB_LATITUDE_OFFSET + tiltOffset + extOffset].nx);
 		
 		glDrawElements(GL_TRIANGLE_STRIP, SQB_LATITUDE_STRIP_INDEX_COUNT, GL_UNSIGNED_INT, latitudeStrip);
 	}
