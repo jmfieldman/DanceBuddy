@@ -52,6 +52,6 @@
 
 SINGLETON_INTR(SquishyBody);
 
-- (void) renderInGL;
+- (void) renderWithTilt:(float)tilt extenstion:(float)ext;
 
 @end

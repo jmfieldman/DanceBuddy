@@ -9,6 +9,9 @@
 #import "DanceSceneView.h"
 #import "SquishyBody.h"
 
+static float s_tilt = 0;
+static float s_ext  = 0;
+
 @implementation DanceSceneView
 
 - (id)initWithFrame:(CGRect)frame {
@@ -57,8 +60,21 @@
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();		
 		
+		UIPanGestureRecognizer *gest = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panGest:)];
+		[self addGestureRecognizer:gest];
 	}
 	return self;
+}
+
+- (void) panGest:(UIPanGestureRecognizer*)gest {
+	CGPoint movement = [gest translationInView:self];
+	[gest setTranslation:CGPointZero inView:self];
+	
+	s_tilt += movement.x / 100;
+	s_ext  -= movement.y / 100;
+	
+	if (s_tilt < 0) s_tilt = 0; if (s_tilt > 1) s_tilt = 1;
+	if (s_ext < 0) s_ext = 0; if (s_ext > 1) s_ext = 1;
 }
 
 /* Anti-alias config */
@@ -102,7 +118,7 @@
 	
 	/* ------- Drawing -------- */
 	
-	[[SquishyBody sharedInstance] renderInGL];
+	[[SquishyBody sharedInstance] renderWithTilt:s_tilt extenstion:s_ext];
 	
 	/* ------------------------ */
 	

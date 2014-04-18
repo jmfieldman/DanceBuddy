@@ -85,7 +85,7 @@ SINGLETON_IMPL(SquishyBody);
 				
 				for (int latitude = 0; latitude < SQB_LATITUDE_COUNT; latitude++) {
 					
-					#if 0
+					#if 0 /* Sphere test */
 					GLfloat xy_radian = M_PI * 2 * longitude / (GLfloat)SQB_LONGITUDES_COUNT;
 					GLfloat x_comp = cos(xy_radian);
 					GLfloat y_comp = sin(xy_radian);
@@ -96,7 +96,7 @@ SINGLETON_IMPL(SquishyBody);
 					normalize_3d_to_length(&x_comp, &y_comp, &z_comp, 1);
 					#endif
 					
-					GLfloat lat_scale = latitude / (GLfloat)SQB_LATITUDE_COUNT;
+					GLfloat lat_scale = latitude / (GLfloat)(SQB_LATITUDE_COUNT-1);
 					
 					GLfloat x_comp = base_x * lat_scale + neck_x * (1 - lat_scale);
 					GLfloat y_comp = base_y * lat_scale + neck_y * (1 - lat_scale);
@@ -132,12 +132,12 @@ SINGLETON_IMPL(SquishyBody);
 	EXLog(OPENGL, DBG, @"Finished generateBodyData");
 }
 
-- (void) renderInGL {
+- (void) renderWithTilt:(float)tilt extenstion:(float)ext {
 
 	static double s = 0;
 	if (s == 0) s = CFAbsoluteTimeGetCurrent();
 	double t = CFAbsoluteTimeGetCurrent();
-	double dif = t - s;
+	//double dif = t - s;
 	
 	/* White */
 	glColor4f(1, 1, 1, 1);
@@ -155,14 +155,15 @@ SINGLETON_IMPL(SquishyBody);
 	
 	glPushMatrix();
 	
-	glTranslatef(0, 0, 5);
-	glRotatef(dif * 60, 1, 0, 0);
+	glTranslatef(0, -2, 5);
+	//glRotatef(dif * 60, 1, 0, 0);
+	glRotatef(-90, 1, 0, 0);
 	
-	int tilt = 31;
-	int ext  = 8;
+	int tilti = (int)(31 * tilt);
+	int exti  = (int)(31 * ext);
 	
-	int tiltOffset = tilt * SQB_TILT_OFFSET;
-	int extOffset  = ext  * SQB_EXTENSION_OFFSET;
+	int tiltOffset = tilti * SQB_TILT_OFFSET;
+	int extOffset  = exti  * SQB_EXTENSION_OFFSET;
 	
 	for (int latitude = 0; latitude < (SQB_LATITUDE_COUNT-1); latitude++) {
 		/* Set pointers */
