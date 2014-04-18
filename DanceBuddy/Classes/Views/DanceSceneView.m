@@ -21,7 +21,7 @@ static float s_ext  = 0;
 		CAEAGLLayer *eaglLayer = (CAEAGLLayer *)self.layer;
 		
 		/* Initialize GL layer properties */
-		eaglLayer.contentsScale = 1;
+		eaglLayer.contentsScale = [UIScreen mainScreen].scale;
 		eaglLayer.opaque = YES;
 		eaglLayer.drawableProperties = [NSDictionary dictionaryWithObjectsAndKeys:
 										[NSNumber numberWithBool:NO], kEAGLDrawablePropertyRetainedBacking, kEAGLColorFormatRGBA8, kEAGLDrawablePropertyColorFormat, nil];

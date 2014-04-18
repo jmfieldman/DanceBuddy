@@ -22,6 +22,7 @@ SINGLETON_IMPL(MainSceneViewController);
 		self.view.backgroundColor = [UIColor redColor];
 		
 		_scene = [[DanceSceneView alloc] initWithFrame:self.view.bounds];
+		_scene.antiAliasingConfig = YES;
 		[self.view addSubview:_scene];
 		
 		/* Begin animations */

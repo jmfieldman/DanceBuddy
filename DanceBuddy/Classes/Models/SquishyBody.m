@@ -17,11 +17,11 @@ SINGLETON_IMPL(SquishyBody);
 
 		_baseRadius    = 1.0;
 		_neckRadius    = 1.0;
-		_pivotHeight   = 0.75;
+		_pivotHeight   = 0.5;
 		_maxNeckTilt   = 20 * M_PI / 180.0;
-		_minNeckExt    = 0.25;
-		_maxNeckExt    = 2.75;
-		_bodyArcLength = 2;
+		_minNeckExt    = 0.5;
+		_maxNeckExt    = 0.75;
+		_bodyArcLength = 2.5;
 		
 		[self generateBodyData];
 		
@@ -39,6 +39,13 @@ SINGLETON_IMPL(SquishyBody);
 
  */
 
+- (double) radiusForAltitude:(double)altitude {
+	double alt = altitude * altitude * 3.5;
+	alt = pow(altitude, 1.6) * 3;
+	if (alt < altitude) alt = altitude;
+	return alt;
+}
+
 - (void) generateBodyData {
 	
 	EXLog(OPENGL, DBG, @"Started generateBodyData [%ld verts]", (long)sizeof(vertexes));
@@ -55,7 +62,7 @@ SINGLETON_IMPL(SquishyBody);
 		for (int ext = 0; ext < SQB_EXTENSION_COUNT; ext++) {
 			
 			/* Create the actual extension vector based on the extension length */
-			GLfloat extensionLength = _minNeckExt + (ext / (GLfloat)SQB_EXTENSION_COUNT) * (_maxNeckExt - _minNeckExt);
+			GLfloat extensionLength = _minNeckExt + (ext / (GLfloat)(SQB_EXTENSION_COUNT-1)) * (_maxNeckExt - _minNeckExt);
 			GLfloat_v trueExtensionVector = { tiltExtensionVector.x * extensionLength, 0, tiltExtensionVector.z * extensionLength };
 			
 			for (int longitude = 0; longitude < SQB_LONGITUDES_COUNT; longitude++) {
@@ -83,6 +90,71 @@ SINGLETON_IMPL(SquishyBody);
 				GLfloat base_y = sin(longitudeRadians) * _baseRadius;
 				GLfloat base_z = 0;
 				
+				/* -------- Calculate the bulge -------- */
+				
+				GLfloat_v neck_v = { neck_x, neck_y, neck_z };
+				GLfloat_v base_v = { base_x, base_y, base_z };
+				
+				/* Need to get the altitude from bisection to point */
+				GLfloat_v mid_v;  midpoint_3dv(&base_v, &neck_v, &mid_v);
+				GLfloat_v half_v; difference_3dv(&neck_v, &mid_v, &half_v);
+				GLfloat   altitude = length_3dv(&half_v);
+				
+				/* 
+				 We know that r * sinT = altitude  ====>  r = altitude / sinT
+				 s = rT  ---->  s = altitude * (T / sinT)  -----> altitude / s = sinT / T
+				 sinT / T is a taylor series: 1 - T^2 / 6 + T^4 / 120
+				 
+				 Quadratic (we are given s):
+				 
+				 T^4 / 120 - T^2 / 6 + (1 - alt/s) = 0
+				 
+				 T^2 = 1/6 + rt( (1/6)^2 - 4(1-alt/s)(1/120) )  qty / (1/60)
+				 
+				 T = rt(that^)
+				 
+				 r = altitude / sinT
+				 */
+				double perceived_arc_length = (1) * _bodyArcLength / 2;
+
+				double thetasq = 1/6.0 - sqrt( ((1/6.0)*(1/6.0)) - (4 * (1 - altitude/perceived_arc_length) * (1/120.0)) );
+				thetasq /= (1/60.0);
+				double theta = sqrt(thetasq);
+				double radius = altitude / sin(theta);
+				
+				/* Hacks */
+				radius = [self radiusForAltitude:altitude];
+				theta  = asin(altitude / radius);
+				
+				//NSLog(@"%f, %f, %f, %f, %lf, %lf", (float)extensionLength, (float)base_z, (float)neck_z, (float)altitude, theta, radius);
+				
+				/* We're going to calculate all of this in the XZ plane, then rotate it over the XY plane by longitude radians */
+				
+				GLfloat_v xz_mapped_neck_v = { neck_v.x * cos(-longitudeRadians) - neck_v.y * sin(-longitudeRadians),
+											   neck_v.x * sin(-longitudeRadians) + neck_v.y * cos(-longitudeRadians),
+											   neck_v.z };
+				
+				GLfloat_v xz_mapped_base_v = { _baseRadius, 0, 0 };
+				
+				/* --- Figure out bisection line --- */
+				
+				GLfloat_v xz_mapped_midpoint_v = { (xz_mapped_base_v.x + xz_mapped_neck_v.x)/2, 0, (xz_mapped_base_v.z + xz_mapped_neck_v.z)/2 };
+				
+				/* Angles */
+				double angle_base_to_neck = atan2( xz_mapped_neck_v.z - xz_mapped_base_v.z , xz_mapped_neck_v.x - xz_mapped_base_v.x);
+				double angle_from_mid_to_center = angle_base_to_neck + M_PI/2;
+				double length_from_mid_to_center = radius * cos( theta );
+				
+				GLfloat_v xz_mapped_circle_center = { xz_mapped_midpoint_v.x + length_from_mid_to_center * cos(angle_from_mid_to_center), 0, xz_mapped_midpoint_v.z + length_from_mid_to_center * sin(angle_from_mid_to_center) };
+	
+				//NSLog(@"%f, %f, %f, %f, %f", xz_mapped_midpoint_v.x, xz_mapped_midpoint_v.z, xz_mapped_circle_center.x, xz_mapped_circle_center.z, length_from_mid_to_center);
+				
+				//NSLog(@"%f %f %f", xz_mapped_neck_v.x, xz_mapped_neck_v.y, xz_mapped_neck_v.z );
+				
+				/* Angles to sweep */
+				double current_angle = (angle_from_mid_to_center - M_PI) - theta;
+				double next_angle_interval = (2 * theta) / (SQB_LATITUDE_COUNT-1);
+								
 				for (int latitude = 0; latitude < SQB_LATITUDE_COUNT; latitude++) {
 					
 					#if 0 /* Sphere test */
@@ -96,26 +168,39 @@ SINGLETON_IMPL(SquishyBody);
 					normalize_3d_to_length(&x_comp, &y_comp, &z_comp, 1);
 					#endif
 					
+					#if 0 /* Linear test */
 					GLfloat lat_scale = latitude / (GLfloat)(SQB_LATITUDE_COUNT-1);
 					
 					GLfloat x_comp = base_x * lat_scale + neck_x * (1 - lat_scale);
 					GLfloat y_comp = base_y * lat_scale + neck_y * (1 - lat_scale);
 					GLfloat z_comp = base_z * lat_scale + neck_z * (1 - lat_scale);
+					#endif
+										
+					GLfloat_v xz_circle_v = { radius * cos(current_angle), 0, radius * sin(current_angle) };
+					GLfloat_v xz_mapped_point_v = { xz_mapped_circle_center.x + xz_circle_v.x, 0, xz_mapped_circle_center.z + xz_circle_v.z};
+					current_angle += next_angle_interval;
 					
-					
-					
+					GLfloat_v unmapped_point_v = { xz_mapped_point_v.x * cos(longitudeRadians) - xz_mapped_point_v.y * sin(longitudeRadians),
+												   xz_mapped_point_v.x * sin(longitudeRadians) + xz_mapped_point_v.y * cos(longitudeRadians),
+												   xz_mapped_point_v.z };
+										
 					OGLVBO_Vertex_Position_Normal_Texture_t *vertex = &vertexes[ext * SQB_EXTENSION_OFFSET +
 																				tilt * SQB_TILT_OFFSET +
 																				latitude * SQB_LATITUDE_OFFSET +
 																				longitude];
-					vertex->px = x_comp;
-					vertex->py = y_comp;
-					vertex->pz = z_comp;
+
 					
-					normalize_3d_to_length(&x_comp, &y_comp, &z_comp, 1);
-					vertex->nx = x_comp;
-					vertex->ny = y_comp;
-					vertex->nz = z_comp;
+					vertex->px = unmapped_point_v.x;
+					vertex->py = unmapped_point_v.y;
+					vertex->pz = unmapped_point_v.z;
+					
+					unmapped_point_v.x = xz_circle_v.x * cos(longitudeRadians);
+					unmapped_point_v.y = xz_circle_v.x * sin(longitudeRadians);
+					unmapped_point_v.z = xz_circle_v.z;
+					normalize_3dv_to_length(&unmapped_point_v, 1);
+					vertex->nx = unmapped_point_v.x;
+					vertex->ny = unmapped_point_v.y;
+					vertex->nz = unmapped_point_v.z;
 				}
 			}
 		}
