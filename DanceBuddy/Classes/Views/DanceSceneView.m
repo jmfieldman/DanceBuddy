@@ -54,6 +54,13 @@ static float s_ext  = 0;
 		glFrustumf(-size, size, -size / (rect.size.width / rect.size.height), size /
 				   (rect.size.width / rect.size.height), zNear, zFar);
 		
+		glTranslatef(0, -2, -5); /* 5 units away, 2 units "down" the screen */
+		glRotatef(90, 1, 0, 0);
+		
+		/* X-axis: left-right        (+right)
+		   Y-axis: in-out of screen  (+in)
+		   Z-axis: up-down screen    (+up)  */
+				
 		glDepthRangef(zNear, zFar);
 		
 		/* Leave projection mode */
@@ -100,7 +107,7 @@ static float s_ext  = 0;
 	}
 	
 	/* Clear */
-	glClearColor(0,1,0,0);
+	glClearColor(0.1,0.2,0.3,0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
 	/* Initialize matrix mode */

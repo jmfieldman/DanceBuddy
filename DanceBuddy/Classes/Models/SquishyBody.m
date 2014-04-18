@@ -221,7 +221,7 @@ SINGLETON_IMPL(SquishyBody);
 
 	static double s = 0;
 	if (s == 0) s = CFAbsoluteTimeGetCurrent();
-	double t = CFAbsoluteTimeGetCurrent();
+	//double t = CFAbsoluteTimeGetCurrent();
 	//double dif = t - s;
 	
 	/* White */
@@ -235,14 +235,26 @@ SINGLETON_IMPL(SquishyBody);
 	glEnableClientState(GL_NORMAL_ARRAY);
 	
 	/* Lighting */
+	glShadeModel(GL_SMOOTH);
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
+	GLfloat mat_specular[] = { 0.0, 0.0, 1.0, 1.0 };
+	GLfloat mat_shininess[] = { 0.0 };
+	GLfloat light_position[] = { -0.2, 1.0, 0.5, 0.0 };
+	GLfloat light_ambient[]  = { 1.0, 1.0, 0.0, 1.0 };
+	GLfloat light_spec[]     = { 0.0, 0.0, 1.0, 1.0 };
+	glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+	glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+	glLightfv(GL_LIGHT0, GL_AMBIENT,  light_ambient);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, light_spec);
+
 	
 	glPushMatrix();
 	
-	glTranslatef(0, -2, 5);
+	//glTranslatef(0, -2, 5);
 	//glRotatef(dif * 60, 1, 0, 0);
-	glRotatef(-90, 1, 0, 0);
+	//glRotatef(-90, 1, 0, 0);
 	
 	int tilti = (int)(31 * tilt);
 	int exti  = (int)(31 * ext);
