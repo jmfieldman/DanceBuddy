@@ -40,10 +40,27 @@ SINGLETON_IMPL(SquishyBody);
  */
 
 - (double) radiusForAltitude:(double)altitude {
+	#if 0
 	double alt = altitude * altitude * 3.5;
 	alt = pow(altitude, 1.6) * 3;
 	if (alt < altitude) alt = altitude;
 	return alt;
+	#endif
+	
+	double theta = M_PI / 4;
+	double diff  = M_PI / 8;
+	double areaTarget = 0.055;
+	
+	while (diff > (0.000001)) {
+		double radius = altitude / sin(theta);
+		double area = 0.5 * radius * ( radius * theta - cos(theta) * altitude );
+		if (area > areaTarget) theta -= diff; else theta += diff;
+		diff /= 2;
+	}
+	
+	//NSLog(@"%lf", theta);
+	
+	return altitude / sin(theta);
 }
 
 - (void) generateBodyData {
@@ -115,16 +132,18 @@ SINGLETON_IMPL(SquishyBody);
 				 
 				 r = altitude / sinT
 				 */
+				#if 0
 				double perceived_arc_length = (1) * _bodyArcLength / 2;
 
 				double thetasq = 1/6.0 - sqrt( ((1/6.0)*(1/6.0)) - (4 * (1 - altitude/perceived_arc_length) * (1/120.0)) );
 				thetasq /= (1/60.0);
 				double theta = sqrt(thetasq);
 				double radius = altitude / sin(theta);
+				#endif
 				
 				/* Hacks */
-				radius = [self radiusForAltitude:altitude];
-				theta  = asin(altitude / radius);
+				double radius = [self radiusForAltitude:altitude];
+				double theta  = asin(altitude / radius);
 				
 				//NSLog(@"%f, %f, %f, %f, %lf, %lf", (float)extensionLength, (float)base_z, (float)neck_z, (float)altitude, theta, radius);
 				
