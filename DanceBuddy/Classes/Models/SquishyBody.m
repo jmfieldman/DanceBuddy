@@ -273,7 +273,8 @@ SINGLETON_IMPL(SquishyBody);
 	//double dif = t - s;
 	
 	/* White */
-	glColor4f(1, 1, 1, 1);
+	//glEnable(GL_COLOR_MATERIAL);
+	glColor4f(0.7, 0.7, 0.5, 1);
 	
 	/* Release any held buffer */
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -286,17 +287,33 @@ SINGLETON_IMPL(SquishyBody);
 	glShadeModel(GL_SMOOTH);
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
-	GLfloat mat_specular[] = { 0.0, 0.0, 1.0, 1.0 };
-	GLfloat mat_shininess[] = { 0.0 };
-	GLfloat light_position[] = { -0.2, 1.0, 0.5, 0.0 };
-	GLfloat light_ambient[]  = { 1.0, 1.0, 0.0, 1.0 };
-	GLfloat light_spec[]     = { 0.0, 0.0, 1.0, 1.0 };
-	glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
-	glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+	
+
+	GLfloat mat_specular[]   = { 1.0, 1.0, 1.0, 1.0 };
+	GLfloat mat_diffuse[]    = { 1.0, 1.0, 1.0, 1.0 };
+	GLfloat mat_ambient[]    = { 1.0, 1.0, 0.5, 1.0 };
+	GLfloat mat_shininess[]  = { 50.0 };
+		
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,  mat_specular);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, mat_shininess);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,   mat_diffuse);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,   mat_ambient);
+
+	
+	GLfloat light_position[] = { -2.2, 5.0, 2.0, 1.0 };
+	GLfloat light_ambient[]  = { 0.3, 0.3, 0.3, 1.0 };
+	GLfloat light_spec[]     = { 0.0, 0.0, 0.0, 1.0 };
+	GLfloat light_diffuse[]  = { 0.5, 0.5, 0.5, 1.0 };
+	
 	glLightfv(GL_LIGHT0, GL_POSITION, light_position);
 	glLightfv(GL_LIGHT0, GL_AMBIENT,  light_ambient);
 	glLightfv(GL_LIGHT0, GL_SPECULAR, light_spec);
-
+	glLightfv(GL_LIGHT0, GL_DIFFUSE,  light_diffuse);
+	
+	//GLfloat light0Direction[] = {0.2, -1.0, -0.5 };
+	GLfloat light0Direction[] = {2.2, -5.0, -2.0 };
+    glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, light0Direction);
+	glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 45.0);
 	
 	glPushMatrix();
 	

@@ -59,7 +59,7 @@ static float s_rad  = 0;
 		glRotatef(90, 1, 0, 0);
 		
 		/* X-axis: left-right        (+right)
-		   Y-axis: in-out of screen  (+in)
+		   Y-axis: in-out of screen  (+out)
 		   Z-axis: up-down screen    (+up)  */
 				
 		glDepthRangef(zNear, zFar);
