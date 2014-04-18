@@ -27,10 +27,11 @@
 	GLint  _viewBackingPixelWidth;
 	GLint  _viewBackingPixelHeight;
 	
-	
 }
 
 @property (nonatomic, assign) BOOL antiAliasingConfig;
+
+@property (nonatomic, strong) NSMutableArray *dancers;
 
 - (void) render;
 

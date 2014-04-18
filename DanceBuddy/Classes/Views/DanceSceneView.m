@@ -67,11 +67,16 @@ static float s_rad  = 0;
 		/* Leave projection mode */
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();		
+	
+		/* Create dancer array */
+		_dancers = [NSMutableArray array];
 		
+		#if 0
 		UIPanGestureRecognizer *gest = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panGest:)];
 		gest.minimumNumberOfTouches = 1;
 		gest.maximumNumberOfTouches = 2;
 		[self addGestureRecognizer:gest];
+		#endif
 	}
 	return self;
 }
@@ -84,6 +89,7 @@ static float s_rad  = 0;
 		s_tilt += movement.x / 100;
 	} else {
 		s_rad += movement.x / 100;
+		NSLog(@"%f", s_rad);
 	}
 	s_ext  -= movement.y / 100;
 	
@@ -132,7 +138,9 @@ static float s_rad  = 0;
 	
 	/* ------- Drawing -------- */
 	
-	[[SquishyBody sharedInstance] renderWithTilt:s_tilt extension:s_ext rotation:s_rad];
+	for (SquishyBody *dancer in _dancers) {
+		[dancer render];
+	}
 	
 	/* ------------------------ */
 	

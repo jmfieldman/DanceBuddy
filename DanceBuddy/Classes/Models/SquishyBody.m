@@ -10,7 +10,6 @@
 
 @implementation SquishyBody
 
-SINGLETON_IMPL(SquishyBody);
 
 - (id) init {
 	if ((self = [super init])) {
@@ -18,7 +17,7 @@ SINGLETON_IMPL(SquishyBody);
 		_baseRadius    = 1.0;
 		_neckRadius    = 0.9;
 		_pivotHeight   = 0.5;
-		_maxNeckTilt   = 20 * M_PI / 180.0;
+		_maxNeckTilt   = 15 * M_PI / 180.0;
 		_minNeckExt    = 0.5;
 		_maxNeckExt    = 0.75;
 		_bodyArcArea   = 0.06;
@@ -67,7 +66,7 @@ SINGLETON_IMPL(SquishyBody);
 
 - (void) generateBodyData {
 	
-	EXLog(OPENGL, DBG, @"Started generateBodyData [%ld verts]", (long)sizeof(body_vertexes));
+	EXLog(OPENGL, DBG, @"Started generateBodyData [%ld verts]", (long)sizeof(_body_vertexes));
 
 			
 	for (int tilt = 0; tilt < SQB_TILT_COUNT; tilt++) {
@@ -205,7 +204,7 @@ SINGLETON_IMPL(SquishyBody);
 												   xz_mapped_point_v.x * sin(longitudeRadians) + xz_mapped_point_v.y * cos(longitudeRadians),
 												   xz_mapped_point_v.z };
 										
-					OGLVBO_Vertex_Position_Normal_Texture_t *vertex = &body_vertexes[ext * SQB_EXTENSION_OFFSET +
+					OGLVBO_Vertex_Position_Normal_Texture_t *vertex = &_body_vertexes[ext * SQB_EXTENSION_OFFSET +
 																					 tilt * SQB_TILT_OFFSET +
 																					 latitude * SQB_LATITUDE_OFFSET +
 																					 longitude];
@@ -240,7 +239,7 @@ SINGLETON_IMPL(SquishyBody);
 		
 			GLfloat longitudeRadians = M_PI * 2 * (GLfloat)longitude / (SQB_LONGITUDES_COUNT-1);
 			
-			OGLVBO_Vertex_Position_Normal_Texture_t *vertex = &head_vertexes[latitude * SQB_LATITUDE_OFFSET +
+			OGLVBO_Vertex_Position_Normal_Texture_t *vertex = &_head_vertexes[latitude * SQB_LATITUDE_OFFSET +
 																			 longitude];
 			
 			vertex->px = x_map * cos(longitudeRadians);
@@ -256,16 +255,16 @@ SINGLETON_IMPL(SquishyBody);
 	
 	int longitude;
 	for (longitude = 0; longitude < (SQB_LATITUDE_STRIP_INDEX_COUNT/2-1); longitude ++) {
-		latitudeStrip[longitude*2]   = longitude;
-		latitudeStrip[longitude*2+1] = longitude + SQB_LATITUDE_OFFSET;
+		_latitudeStrip[longitude*2]   = longitude;
+		_latitudeStrip[longitude*2+1] = longitude + SQB_LATITUDE_OFFSET;
 	}
-	latitudeStrip[SQB_LATITUDE_STRIP_INDEX_COUNT-2] = 0;
-	latitudeStrip[SQB_LATITUDE_STRIP_INDEX_COUNT-1] = SQB_LATITUDE_OFFSET;
+	_latitudeStrip[SQB_LATITUDE_STRIP_INDEX_COUNT-2] = 0;
+	_latitudeStrip[SQB_LATITUDE_STRIP_INDEX_COUNT-1] = SQB_LATITUDE_OFFSET;
 	
 	EXLog(OPENGL, DBG, @"Finished generateBodyData");
 }
 
-- (void) renderWithTilt:(float)tilt extension:(float)ext rotation:(float)radians {
+- (void) renderWithTilt:(float)tilt extension:(float)ext bodyRotation:(float)bodyRadians headRotation:(float)headRadians {
 
 	static double s = 0;
 	if (s == 0) s = CFAbsoluteTimeGetCurrent();
@@ -300,7 +299,7 @@ SINGLETON_IMPL(SquishyBody);
 	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,   mat_ambient);
 
 	
-	GLfloat light_position[] = { -2.2, 5.0, 2.0, 1.0 };
+	GLfloat light_position[] = { -2.2, 5.0, 5.0, 1.0 };
 	GLfloat light_ambient[]  = { 0.3, 0.3, 0.3, 1.0 };
 	GLfloat light_spec[]     = { 0.0, 0.0, 0.0, 1.0 };
 	GLfloat light_diffuse[]  = { 0.5, 0.5, 0.5, 1.0 };
@@ -311,14 +310,17 @@ SINGLETON_IMPL(SquishyBody);
 	glLightfv(GL_LIGHT0, GL_DIFFUSE,  light_diffuse);
 	
 	//GLfloat light0Direction[] = {0.2, -1.0, -0.5 };
-	GLfloat light0Direction[] = {2.2, -5.0, -2.0 };
+	GLfloat light0Direction[] = {2.2, -5.0, -5.0 };
     glLightfv(GL_LIGHT0, GL_SPOT_DIRECTION, light0Direction);
 	glLightf(GL_LIGHT0, GL_SPOT_CUTOFF, 45.0);
 	
 	glPushMatrix();
 	
 	/* Rotate everything */
-	glRotatef(radians * 180.0 / M_PI, 0, 0, 1);
+	GLfloat bodyDegrees = bodyRadians * 180.0 / M_PI;
+	GLfloat headDegrees = headRadians * 180.0 / M_PI;
+	
+	glRotatef(bodyDegrees, 0, 0, 1);
 	
 	
 	int tilti = (int)((SQB_TILT_COUNT-1) * tilt);
@@ -330,30 +332,125 @@ SINGLETON_IMPL(SquishyBody);
 	/* Draw body */
 	for (int latitude = 0; latitude < (SQB_LATITUDE_COUNT-1); latitude++) {
 		/* Set pointers */
-		glVertexPointer(3, GL_FLOAT, sizeof(OGLVBO_Vertex_Position_Normal_Texture_t), &body_vertexes[latitude * SQB_LATITUDE_OFFSET + tiltOffset + extOffset].px);
-		glNormalPointer(   GL_FLOAT, sizeof(OGLVBO_Vertex_Position_Normal_Texture_t), &body_vertexes[latitude * SQB_LATITUDE_OFFSET + tiltOffset + extOffset].nx);
+		glVertexPointer(3, GL_FLOAT, sizeof(OGLVBO_Vertex_Position_Normal_Texture_t), &_body_vertexes[latitude * SQB_LATITUDE_OFFSET + tiltOffset + extOffset].px);
+		glNormalPointer(   GL_FLOAT, sizeof(OGLVBO_Vertex_Position_Normal_Texture_t), &_body_vertexes[latitude * SQB_LATITUDE_OFFSET + tiltOffset + extOffset].nx);
 		
-		glDrawElements(GL_TRIANGLE_STRIP, SQB_LATITUDE_STRIP_INDEX_COUNT, GL_UNSIGNED_INT, latitudeStrip);
+		glDrawElements(GL_TRIANGLE_STRIP, SQB_LATITUDE_STRIP_INDEX_COUNT, GL_UNSIGNED_INT, _latitudeStrip);
 	}
 	
 	/* Transform for head */
 	glTranslatef(0, 0, _pivotHeight);
-	glRotatef((_maxNeckTilt * 180.0 / M_PI) * tilt, 0, 1, 0);
+	glRotatef((_maxNeckTilt * 180.0 / M_PI) * tilt + 0.01, 0, 1, 0);
+	glRotatef((headDegrees - bodyDegrees), 0, 0, 1);
 	glTranslatef(0, 0, _minNeckExt + (_maxNeckExt - _minNeckExt) * ext + _headOffset);
 	glScalef(_headRadius, _headRadius, _headRadius);
 	
 	/* Draw head verts */
 	for (int latitude = 0; latitude < (SQB_LATITUDE_COUNT-1); latitude++) {
 		/* Set pointers */
-		glVertexPointer(3, GL_FLOAT, sizeof(OGLVBO_Vertex_Position_Normal_Texture_t), &head_vertexes[latitude * SQB_LATITUDE_OFFSET].px);
-		glNormalPointer(   GL_FLOAT, sizeof(OGLVBO_Vertex_Position_Normal_Texture_t), &head_vertexes[latitude * SQB_LATITUDE_OFFSET].nx);
+		glVertexPointer(3, GL_FLOAT, sizeof(OGLVBO_Vertex_Position_Normal_Texture_t), &_head_vertexes[latitude * SQB_LATITUDE_OFFSET].px);
+		glNormalPointer(   GL_FLOAT, sizeof(OGLVBO_Vertex_Position_Normal_Texture_t), &_head_vertexes[latitude * SQB_LATITUDE_OFFSET].nx);
 		
-		glDrawElements(GL_TRIANGLE_STRIP, SQB_LATITUDE_STRIP_INDEX_COUNT, GL_UNSIGNED_INT, latitudeStrip);
+		glDrawElements(GL_TRIANGLE_STRIP, SQB_LATITUDE_STRIP_INDEX_COUNT, GL_UNSIGNED_INT, _latitudeStrip);
+	}
+	
+	/* Draw nose */
+		
+	glPushMatrix();
+	
+	glRotatef(-93, 1, 0, 0);
+	glTranslatef(0, 0, 0.95);
+	glScalef(0.12, 0.12, 0.12);
+	
+	{
+		GLfloat mat_specular[]   = { 0.0, 0.0, 0.0, 1.0 };
+		GLfloat mat_diffuse[]    = { 0.1, 0.1, 0.1, 1.0 };
+		GLfloat mat_ambient[]    = { 0.1, 0.1, 0.1, 1.0 };
+		GLfloat mat_shininess[]  = { 0.0 };
+		
+		glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,  mat_specular);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, mat_shininess);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,   mat_diffuse);
+		glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,   mat_ambient);
+	}
+	
+	for (int latitude = 0; latitude < (SQB_LATITUDE_COUNT-1); latitude++) {
+		/* Set pointers */
+		glVertexPointer(3, GL_FLOAT, sizeof(OGLVBO_Vertex_Position_Normal_Texture_t), &_head_vertexes[latitude * SQB_LATITUDE_OFFSET].px);
+		glNormalPointer(   GL_FLOAT, sizeof(OGLVBO_Vertex_Position_Normal_Texture_t), &_head_vertexes[latitude * SQB_LATITUDE_OFFSET].nx);
+		
+		glDrawElements(GL_TRIANGLE_STRIP, SQB_LATITUDE_STRIP_INDEX_COUNT, GL_UNSIGNED_INT, _latitudeStrip);
+	}
+	
+	glPopMatrix();
+	
+	
+	/* Draw eyes */
+	for (int eye = 0; eye < 2; eye++) {
+		glPushMatrix();
+		
+		glRotatef(-23 + eye*46, 0, 0, 1);
+		glRotatef(-83, 1, 0, 0);
+		glTranslatef(0, 0, 0.95);
+		glScalef(0.14, 0.14, 0.10);
+		
+		{
+			GLfloat mat_specular[]   = { 0.0, 0.0, 0.0, 1.0 };
+			GLfloat mat_diffuse[]    = { 0.1, 0.1, 0.1, 1.0 };
+			GLfloat mat_ambient[]    = { 1.0, 1.0, 1.0, 1.0 };
+			GLfloat mat_shininess[]  = { 20.0 };
+			
+			glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,  mat_specular);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, mat_shininess);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,   mat_diffuse);
+			glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,   mat_ambient);
+		}
+		
+		for (int latitude = 0; latitude < (SQB_LATITUDE_COUNT-1); latitude++) {
+			/* Set pointers */
+			glVertexPointer(3, GL_FLOAT, sizeof(OGLVBO_Vertex_Position_Normal_Texture_t), &_head_vertexes[latitude * SQB_LATITUDE_OFFSET].px);
+			glNormalPointer(   GL_FLOAT, sizeof(OGLVBO_Vertex_Position_Normal_Texture_t), &_head_vertexes[latitude * SQB_LATITUDE_OFFSET].nx);
+			
+			glDrawElements(GL_TRIANGLE_STRIP, SQB_LATITUDE_STRIP_INDEX_COUNT, GL_UNSIGNED_INT, _latitudeStrip);
+		}
+		
+		{
+			{
+				GLfloat mat_specular[]   = { 0.01, 0.01, 0.01, 1.0 };
+				GLfloat mat_diffuse[]    = { 0.01, 0.01, 0.01, 1.0 };
+				GLfloat mat_ambient[]    = { 0.0, 0.0, 0.0, 1.0 };
+				GLfloat mat_shininess[]  = { 20.0 };
+				
+				glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,  mat_specular);
+				glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, mat_shininess);
+				glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,   mat_diffuse);
+				glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,   mat_ambient);
+			}
+			
+			glRotatef(-10 + eye*20, 0, 1, 0);
+			glTranslatef(0, 0, 0.65);
+			glScalef(0.5, 0.5, 0.5);
+			
+			for (int latitude = 0; latitude < (SQB_LATITUDE_COUNT-1); latitude++) {
+				/* Set pointers */
+				glVertexPointer(3, GL_FLOAT, sizeof(OGLVBO_Vertex_Position_Normal_Texture_t), &_head_vertexes[latitude * SQB_LATITUDE_OFFSET].px);
+				glNormalPointer(   GL_FLOAT, sizeof(OGLVBO_Vertex_Position_Normal_Texture_t), &_head_vertexes[latitude * SQB_LATITUDE_OFFSET].nx);
+				
+				glDrawElements(GL_TRIANGLE_STRIP, SQB_LATITUDE_STRIP_INDEX_COUNT, GL_UNSIGNED_INT, _latitudeStrip);
+			}
+		}
+		
+		glPopMatrix();
 	}
 	
 	
 	glPopMatrix();
 	
+}
+
+
+- (void) render {
+	[self renderWithTilt:0 extension:0 bodyRotation:0 headRotation:0];
 }
 
 

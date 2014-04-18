@@ -35,6 +35,8 @@
 		35D8728719009EE7008D6385 /* DataTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 35D8728619009EE7008D6385 /* DataTypes.m */; };
 		35D8728A1900B159008D6385 /* SquishyBody.m in Sources */ = {isa = PBXBuildFile; fileRef = 35D872891900B159008D6385 /* SquishyBody.m */; };
 		35D8728D1900C346008D6385 /* GLHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 35D8728C1900C346008D6385 /* GLHelper.m */; };
+		35D872901901D23D008D6385 /* DanceTween.m in Sources */ = {isa = PBXBuildFile; fileRef = 35D8728F1901D23D008D6385 /* DanceTween.m */; };
+		35D872931901D45D008D6385 /* TweeningQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 35D872921901D45D008D6385 /* TweeningQueue.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -91,6 +93,10 @@
 		35D872891900B159008D6385 /* SquishyBody.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SquishyBody.m; sourceTree = "<group>"; };
 		35D8728B1900C346008D6385 /* GLHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLHelper.h; sourceTree = "<group>"; };
 		35D8728C1900C346008D6385 /* GLHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GLHelper.m; sourceTree = "<group>"; };
+		35D8728E1901D23D008D6385 /* DanceTween.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DanceTween.h; sourceTree = "<group>"; };
+		35D8728F1901D23D008D6385 /* DanceTween.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DanceTween.m; sourceTree = "<group>"; };
+		35D872911901D45D008D6385 /* TweeningQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TweeningQueue.h; sourceTree = "<group>"; };
+		35D872921901D45D008D6385 /* TweeningQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TweeningQueue.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -255,6 +261,10 @@
 				35D8728619009EE7008D6385 /* DataTypes.m */,
 				35D872881900B159008D6385 /* SquishyBody.h */,
 				35D872891900B159008D6385 /* SquishyBody.m */,
+				35D8728E1901D23D008D6385 /* DanceTween.h */,
+				35D8728F1901D23D008D6385 /* DanceTween.m */,
+				35D872911901D45D008D6385 /* TweeningQueue.h */,
+				35D872921901D45D008D6385 /* TweeningQueue.m */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -361,12 +371,14 @@
 				35D8728D1900C346008D6385 /* GLHelper.m in Sources */,
 				353F6BF7190042DC00074E3E /* MainSceneViewController.m in Sources */,
 				353F6C061900438C00074E3E /* PersistentDictionary.m in Sources */,
+				35D872901901D23D008D6385 /* DanceTween.m in Sources */,
 				35D8728719009EE7008D6385 /* DataTypes.m in Sources */,
 				353F6BD11900421400074E3E /* main.m in Sources */,
 				35D8728A1900B159008D6385 /* SquishyBody.m in Sources */,
 				353F6C051900438C00074E3E /* MathHelper.m in Sources */,
 				353F6C071900438C00074E3E /* SingletonHelper.m in Sources */,
 				353F6C181900448E00074E3E /* DanceSceneView.m in Sources */,
+				35D872931901D45D008D6385 /* TweeningQueue.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

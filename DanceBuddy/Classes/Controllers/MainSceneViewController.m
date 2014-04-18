@@ -25,6 +25,9 @@ SINGLETON_IMPL(MainSceneViewController);
 		_scene.antiAliasingConfig = YES;
 		[self.view addSubview:_scene];
 		
+		_dancer = [[SquishyBody alloc] init];
+		[_scene.dancers addObject:_dancer];
+		
 		/* Begin animations */
 		_displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(processTimeslice:)];
 		[_displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];

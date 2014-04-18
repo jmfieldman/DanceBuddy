@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "TweeningQueue.h"
 
 #define SQB_LONGITUDES_COUNT    32
 #define SQB_LATITUDE_COUNT      16
@@ -21,13 +22,19 @@
 
 @interface SquishyBody : NSObject {
 	/* Data for the body */
-	OGLVBO_Vertex_Position_Normal_Texture_t body_vertexes[SQB_LONGITUDES_COUNT * SQB_LATITUDE_COUNT * SQB_TILT_COUNT * SQB_EXTENSION_COUNT];
+	OGLVBO_Vertex_Position_Normal_Texture_t _body_vertexes[SQB_LONGITUDES_COUNT * SQB_LATITUDE_COUNT * SQB_TILT_COUNT * SQB_EXTENSION_COUNT];
 	
 	/* Data for the head sphere */
-	OGLVBO_Vertex_Position_Normal_Texture_t head_vertexes[SQB_LONGITUDES_COUNT * SQB_LATITUDE_COUNT];
+	OGLVBO_Vertex_Position_Normal_Texture_t _head_vertexes[SQB_LONGITUDES_COUNT * SQB_LATITUDE_COUNT];
 	
 	/* Indices for a latitude strip */
-	GLuint latitudeStrip[SQB_LATITUDE_STRIP_INDEX_COUNT];
+	GLuint _latitudeStrip[SQB_LATITUDE_STRIP_INDEX_COUNT];
+	
+	/* Tweening queues */
+	TweeningQueue *_tweenQueueTilt;
+	TweeningQueue *_tweenQueueExtension;
+	TweeningQueue *_tweenQueueBodyRotation;
+	TweeningQueue *_tweenQueueHeadRotation;
 }
 
 
@@ -59,8 +66,16 @@
 @property (nonatomic, assign) GLfloat headOffset;
 
 
-SINGLETON_INTR(SquishyBody);
+/* ----- Current positioning state ----- */
 
-- (void) renderWithTilt:(float)tilt extension:(float)ext rotation:(float)radians;
+/* All values from 0-1 */
+
+@property (nonatomic, readonly) float currentTilt;
+@property (nonatomic, readonly) float currentExtension;
+@property (nonatomic, readonly) float currentBodyRotation;
+@property (nonatomic, readonly) float currentHeadRotation;
+
+
+- (void) render;
 
 @end

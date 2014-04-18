@@ -8,6 +8,7 @@
 
 #import <UIKit/UIKit.h>
 #import "DanceSceneView.h"
+#import "SquishyBody.h"
 
 @interface MainSceneViewController : UIViewController {
 	/* Animation Timer */
@@ -16,6 +17,9 @@
 	
 	/* Scene */
 	DanceSceneView *_scene;
+	
+	/* Dancer */
+	SquishyBody *_dancer;
 }
 
 SINGLETON_INTR(MainSceneViewController);
