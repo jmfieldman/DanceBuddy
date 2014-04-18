@@ -26,6 +26,47 @@
 		
 		[self generateBodyData];
 		
+		/* Init tween queues */
+		_tweenQueueTilt         = [[TweeningQueue alloc] init];
+		_tweenQueueExtension    = [[TweeningQueue alloc] init];
+		_tweenQueueBodyRotation = [[TweeningQueue alloc] init];
+		_tweenQueueHeadRotation = [[TweeningQueue alloc] init];
+		
+
+		for (int i = 0; i < 100; i++) {
+			for (int j = 0; j < 4; j++) {
+				[_tweenQueueExtension addTween:[[DanceTween alloc] initWithDuration:0.125 toValue:1 curve:DANCE_TWEEN_CURVE_LINEAR completion:nil]];
+				[_tweenQueueExtension addTween:[[DanceTween alloc] initWithDuration:0.125 toValue:1 curve:DANCE_TWEEN_CURVE_LINEAR completion:nil]];
+				[_tweenQueueExtension addTween:[[DanceTween alloc] initWithDuration:0.125 toValue:0 curve:DANCE_TWEEN_CURVE_LINEAR completion:nil]];
+				[_tweenQueueExtension addTween:[[DanceTween alloc] initWithDuration:0.125 toValue:0 curve:DANCE_TWEEN_CURVE_LINEAR completion:nil]];
+				
+				[_tweenQueueTilt addTween:[[DanceTween alloc] initWithDuration:0.125 toValue:0 curve:DANCE_TWEEN_CURVE_LINEAR completion:nil]];
+				[_tweenQueueTilt addTween:[[DanceTween alloc] initWithDuration:0.125 toValue:0 curve:DANCE_TWEEN_CURVE_LINEAR completion:nil]];
+				[_tweenQueueTilt addTween:[[DanceTween alloc] initWithDuration:0.125 toValue:1 curve:DANCE_TWEEN_CURVE_LINEAR completion:nil]];
+				[_tweenQueueTilt addTween:[[DanceTween alloc] initWithDuration:0.125 toValue:1 curve:DANCE_TWEEN_CURVE_LINEAR completion:nil]];
+				
+				[_tweenQueueHeadRotation addTween:[[DanceTween alloc] initWithDuration:0.125 toValue:0.05 curve:DANCE_TWEEN_CURVE_LINEAR completion:nil]];
+				[_tweenQueueHeadRotation addTween:[[DanceTween alloc] initWithDuration:0.125 toValue:0.05 curve:DANCE_TWEEN_CURVE_LINEAR completion:nil]];
+				[_tweenQueueHeadRotation addTween:[[DanceTween alloc] initWithDuration:0.125 toValue:0 curve:DANCE_TWEEN_CURVE_LINEAR completion:nil]];
+				[_tweenQueueHeadRotation addTween:[[DanceTween alloc] initWithDuration:0.125 toValue:0 curve:DANCE_TWEEN_CURVE_LINEAR completion:nil]];
+			}
+			for (int j = 0; j < 4; j++) {
+				[_tweenQueueExtension addTween:[[DanceTween alloc] initWithDuration:0.125 toValue:1 curve:DANCE_TWEEN_CURVE_LINEAR completion:nil]];
+				[_tweenQueueExtension addTween:[[DanceTween alloc] initWithDuration:0.125 toValue:1 curve:DANCE_TWEEN_CURVE_LINEAR completion:nil]];
+				[_tweenQueueExtension addTween:[[DanceTween alloc] initWithDuration:0.125 toValue:0 curve:DANCE_TWEEN_CURVE_LINEAR completion:nil]];
+				[_tweenQueueExtension addTween:[[DanceTween alloc] initWithDuration:0.125 toValue:0 curve:DANCE_TWEEN_CURVE_LINEAR completion:nil]];
+				
+				[_tweenQueueTilt addTween:[[DanceTween alloc] initWithDuration:0.125 toValue:1 curve:DANCE_TWEEN_CURVE_LINEAR completion:nil]];
+				[_tweenQueueTilt addTween:[[DanceTween alloc] initWithDuration:0.125 toValue:1 curve:DANCE_TWEEN_CURVE_LINEAR completion:nil]];
+				[_tweenQueueTilt addTween:[[DanceTween alloc] initWithDuration:0.125 toValue:0 curve:DANCE_TWEEN_CURVE_LINEAR completion:nil]];
+				[_tweenQueueTilt addTween:[[DanceTween alloc] initWithDuration:0.125 toValue:0 curve:DANCE_TWEEN_CURVE_LINEAR completion:nil]];
+				
+				[_tweenQueueHeadRotation addTween:[[DanceTween alloc] initWithDuration:0.125 toValue:-0.02 curve:DANCE_TWEEN_CURVE_LINEAR completion:nil]];
+				[_tweenQueueHeadRotation addTween:[[DanceTween alloc] initWithDuration:0.125 toValue:-0.02 curve:DANCE_TWEEN_CURVE_LINEAR completion:nil]];
+				[_tweenQueueHeadRotation addTween:[[DanceTween alloc] initWithDuration:0.125 toValue:-0.06 curve:DANCE_TWEEN_CURVE_LINEAR completion:nil]];
+				[_tweenQueueHeadRotation addTween:[[DanceTween alloc] initWithDuration:0.125 toValue:-0.06 curve:DANCE_TWEEN_CURVE_LINEAR completion:nil]];
+			}
+		}
 	}
 	return self;
 }
@@ -450,8 +491,33 @@
 
 
 - (void) render {
-	[self renderWithTilt:0 extension:0 bodyRotation:0 headRotation:0];
+	[self renderWithTilt:_currentTilt extension:_currentExtension bodyRotation:_currentBodyRotation * (M_PI * 2) headRotation:_currentHeadRotation * (M_PI * 2)];
 }
 
+
+- (void) processDuration:(float)duration {
+	while (YES) {
+		_currentTilt         = [_tweenQueueTilt         processDuration:duration];
+		_currentExtension    = [_tweenQueueExtension    processDuration:duration];
+		_currentBodyRotation = [_tweenQueueBodyRotation processDuration:duration];
+		_currentHeadRotation = [_tweenQueueHeadRotation processDuration:duration];
+		
+		/* Catch syncs */
+		float tSync = _tweenQueueTilt.synchronizingTime;          if (tSync == 0) break;
+		float eSync = _tweenQueueExtension.synchronizingTime;     if (eSync == 0) break;
+		float bSync = _tweenQueueBodyRotation.synchronizingTime;  if (bSync == 0) break;
+		float hSync = _tweenQueueHeadRotation.synchronizingTime;  if (hSync == 0) break;
+		
+		duration = MIN(MIN(tSync, eSync), MIN(bSync, hSync));
+		
+		[_tweenQueueTilt         popTween];
+		[_tweenQueueExtension    popTween];
+		[_tweenQueueBodyRotation popTween];
+		[_tweenQueueHeadRotation popTween];
+		
+		/* Repeat with the next group of tweens */
+	}
+		
+}
 
 @end

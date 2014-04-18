@@ -55,7 +55,7 @@ static float s_rad  = 0;
 		glFrustumf(-size, size, -size / (rect.size.width / rect.size.height), size /
 				   (rect.size.width / rect.size.height), zNear, zFar);
 		
-		glTranslatef(0, -2, -5); /* 5 units away, 2 units "down" the screen */
+		glTranslatef(0, -2, -4.5); /* 5 units away, 2 units "down" the screen */
 		glRotatef(90, 1, 0, 0);
 		
 		/* X-axis: left-right        (+right)

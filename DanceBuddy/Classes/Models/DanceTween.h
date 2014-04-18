@@ -33,7 +33,7 @@ typedef void (^DanceTweenCompletionBlock)(DanceTween* tween);
 
 @property (nonatomic, copy) DanceTweenCompletionBlock completionBlock;
 
-- (id) initWithFrom:(float)from to:(float)to duration:(float)duration curve:(DanceTweenCurve_t)curve completion:(DanceTweenCompletionBlock)block;
+- (id) initWithDuration:(float)duration toValue:(float)toValue curve:(DanceTweenCurve_t)curve completion:(DanceTweenCompletionBlock)block;
 
 + (DanceTween*) syncTween;
 + (DanceTween*) syncTweenWithCompletion:(DanceTweenCompletionBlock)block;

@@ -78,4 +78,8 @@
 
 - (void) render;
 
+/* Tweening */
+
+- (void) processDuration:(float)duration;
+
 @end

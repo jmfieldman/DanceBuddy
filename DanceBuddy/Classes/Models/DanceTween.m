@@ -10,29 +10,32 @@
 
 @implementation DanceTween
 
-- (id) initWithFrom:(float)from to:(float)to duration:(float)duration curve:(DanceTweenCurve_t)curve completion:(DanceTweenCompletionBlock)block {
+- (id) initWithDuration:(float)duration toValue:(float)toValue curve:(DanceTweenCurve_t)curve completion:(DanceTweenCompletionBlock)block {
 	if ((self = [super init])) {
-		_fromValue = from;
-		_toValue   = to;
+		_toValue   = toValue;
 		_duration  = duration;
 		_curve     = curve;
 		_progress  = 0;
 		
 		self.completionBlock = block;
-		
-		_tweenDifference = _toValue - _fromValue;
+				
 	}
 	return self;
 }
 
 + (DanceTween*) syncTween {
-	return [[DanceTween alloc] initWithFrom:0 to:0 duration:0 curve:DANCE_TWEEN_CURVE_SYNC completion:nil];
+	return [[DanceTween alloc] initWithDuration:0 toValue:0 curve:DANCE_TWEEN_CURVE_SYNC completion:nil];
 }
 
 + (DanceTween*) syncTweenWithCompletion:(DanceTweenCompletionBlock)block {
 	DanceTween *tween = [DanceTween syncTween];
 	tween.completionBlock = block;
 	return tween;
+}
+
+- (void) setFromValue:(float)fromValue {
+	_fromValue = fromValue;
+	_tweenDifference = _toValue - _fromValue;
 }
 
 - (float) processDuration:(float)duration {

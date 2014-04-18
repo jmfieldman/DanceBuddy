@@ -31,17 +31,21 @@ SINGLETON_IMPL(MainSceneViewController);
 		/* Begin animations */
 		_displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(processTimeslice:)];
 		[_displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
+		
+		/* Init timeslice */
+		_lastSliceTimestamp = CFAbsoluteTimeGetCurrent();
 	}
 	return self;
 }
 
 - (void) processTimeslice:(id)sender {
 	double currentSliceTimestamp = CFAbsoluteTimeGetCurrent();
-	/* double timeDiff = currentSliceTimestamp - _lastSliceTimestamp; */ /* Used to get time diff between frames */
+	double timeDiff = currentSliceTimestamp - _lastSliceTimestamp; /* Used to get time diff between frames */
 	_lastSliceTimestamp = currentSliceTimestamp;
 	
 	[self _frameRateCheckpoint];
 	
+	[_dancer processDuration:timeDiff];
 	[_scene render];
 }
 
