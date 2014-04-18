@@ -54,8 +54,7 @@
 		
 		/* Leave projection mode */
 		glMatrixMode(GL_MODELVIEW);
-		glLoadIdentity();
-		
+		glLoadIdentity();		
 		
 	}
 	return self;
@@ -102,7 +101,7 @@
 	
 	/* ------- Drawing -------- */
 	
-	
+
 	
 	/* ------------------------ */
 	

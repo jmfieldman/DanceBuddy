@@ -27,4 +27,5 @@
 	#import "PersistentDictionary.h"
 	#import "MathHelper.h"
 	#import "SingletonHelper.h"
+	#import "DataTypes.h"
 #endif

@@ -32,6 +32,8 @@
 		353F6C121900441200074E3E /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 353F6C0E1900441200074E3E /* SystemConfiguration.framework */; };
 		353F6C141900442B00074E3E /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 353F6C131900442B00074E3E /* StoreKit.framework */; };
 		353F6C181900448E00074E3E /* DanceSceneView.m in Sources */ = {isa = PBXBuildFile; fileRef = 353F6C171900448E00074E3E /* DanceSceneView.m */; };
+		35D8728719009EE7008D6385 /* DataTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 35D8728619009EE7008D6385 /* DataTypes.m */; };
+		35D8728A1900B159008D6385 /* SquishyBody.m in Sources */ = {isa = PBXBuildFile; fileRef = 35D872891900B159008D6385 /* SquishyBody.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -82,6 +84,10 @@
 		353F6C131900442B00074E3E /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		353F6C161900448E00074E3E /* DanceSceneView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DanceSceneView.h; sourceTree = "<group>"; };
 		353F6C171900448E00074E3E /* DanceSceneView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DanceSceneView.m; sourceTree = "<group>"; };
+		35D8728519009EE7008D6385 /* DataTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DataTypes.h; sourceTree = "<group>"; };
+		35D8728619009EE7008D6385 /* DataTypes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DataTypes.m; sourceTree = "<group>"; };
+		35D872881900B159008D6385 /* SquishyBody.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SquishyBody.h; sourceTree = "<group>"; };
+		35D872891900B159008D6385 /* SquishyBody.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SquishyBody.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -193,6 +199,7 @@
 			isa = PBXGroup;
 			children = (
 				353F6BF81900438C00074E3E /* Helpers */,
+				35D8728419009ED8008D6385 /* Models */,
 				353F6C151900447400074E3E /* Views */,
 				353F6BF4190042C200074E3E /* Controllers */,
 			);
@@ -234,6 +241,17 @@
 				353F6C171900448E00074E3E /* DanceSceneView.m */,
 			);
 			path = Views;
+			sourceTree = "<group>";
+		};
+		35D8728419009ED8008D6385 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				35D8728519009EE7008D6385 /* DataTypes.h */,
+				35D8728619009EE7008D6385 /* DataTypes.m */,
+				35D872881900B159008D6385 /* SquishyBody.h */,
+				35D872891900B159008D6385 /* SquishyBody.m */,
+			);
+			path = Models;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -337,7 +355,9 @@
 				353F6C0A190043E400074E3E /* NS+Hashes.m in Sources */,
 				353F6BF7190042DC00074E3E /* MainSceneViewController.m in Sources */,
 				353F6C061900438C00074E3E /* PersistentDictionary.m in Sources */,
+				35D8728719009EE7008D6385 /* DataTypes.m in Sources */,
 				353F6BD11900421400074E3E /* main.m in Sources */,
+				35D8728A1900B159008D6385 /* SquishyBody.m in Sources */,
 				353F6C051900438C00074E3E /* MathHelper.m in Sources */,
 				353F6C071900438C00074E3E /* SingletonHelper.m in Sources */,
 				353F6C181900448E00074E3E /* DanceSceneView.m in Sources */,
@@ -460,6 +480,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "DanceBuddy/DanceBuddy-Prefix.pch";
 				INFOPLIST_FILE = "DanceBuddy/DanceBuddy-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				OTHER_CFLAGS = "-DEXDEBUGENABLED";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
@@ -474,6 +495,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "DanceBuddy/DanceBuddy-Prefix.pch";
 				INFOPLIST_FILE = "DanceBuddy/DanceBuddy-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				OTHER_CFLAGS = "";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
@@ -539,6 +561,7 @@
 				353F6BEF1900421400074E3E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		353F6BF01900421400074E3E /* Build configuration list for PBXNativeTarget "DanceBuddyTests" */ = {
 			isa = XCConfigurationList;
@@ -547,6 +570,7 @@
 				353F6BF21900421400074E3E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
