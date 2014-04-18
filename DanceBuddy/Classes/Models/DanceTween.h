@@ -13,6 +13,8 @@ typedef enum DanceTweenCurve {
 	DANCE_TWEEN_CURVE_LINEAR = 1,
 } DanceTweenCurve_t;
 
+@class DanceTween;
+typedef void (^DanceTweenCompletionBlock)(DanceTween* tween);
 
 
 @interface DanceTween : NSObject {
@@ -29,9 +31,14 @@ typedef enum DanceTweenCurve {
 @property (nonatomic, readonly) float progressRatio;
 @property (nonatomic, readonly) float currentValue;
 
-- (id) initWithFrom:(float)from to:(float)to duration:(float)duration curve:(DanceTweenCurve_t)curve;
-- (DanceTween*) syncTween;
+@property (nonatomic, copy) DanceTweenCompletionBlock completionBlock;
 
+- (id) initWithFrom:(float)from to:(float)to duration:(float)duration curve:(DanceTweenCurve_t)curve completion:(DanceTweenCompletionBlock)block;
+
++ (DanceTween*) syncTween;
++ (DanceTween*) syncTweenWithCompletion:(DanceTweenCompletionBlock)block;
+
+/* Returns the remaining time after duration has been processed by this tween (0 if this absorbed it all) */
 - (float) processDuration:(float)duration;
 
 

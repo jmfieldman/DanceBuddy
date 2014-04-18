@@ -17,6 +17,7 @@
 
 - (void) addTween:(DanceTween*)tween;
 
+/* Returns the current value after the duration is processed */
 - (float) processDuration:(float)duration;
 
 @end

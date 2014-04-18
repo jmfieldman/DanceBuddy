@@ -10,7 +10,7 @@
 
 @implementation DanceTween
 
-- (id) initWithFrom:(float)from to:(float)to duration:(float)duration curve:(DanceTweenCurve_t)curve {
+- (id) initWithFrom:(float)from to:(float)to duration:(float)duration curve:(DanceTweenCurve_t)curve completion:(DanceTweenCompletionBlock)block {
 	if ((self = [super init])) {
 		_fromValue = from;
 		_toValue   = to;
@@ -18,15 +18,22 @@
 		_curve     = curve;
 		_progress  = 0;
 		
+		self.completionBlock = block;
+		
 		_tweenDifference = _toValue - _fromValue;
 	}
 	return self;
 }
 
-- (DanceTween*) syncTween {
-	return [[DanceTween alloc] initWithFrom:0 to:0 duration:0 curve:DANCE_TWEEN_CURVE_SYNC];
++ (DanceTween*) syncTween {
+	return [[DanceTween alloc] initWithFrom:0 to:0 duration:0 curve:DANCE_TWEEN_CURVE_SYNC completion:nil];
 }
 
++ (DanceTween*) syncTweenWithCompletion:(DanceTweenCompletionBlock)block {
+	DanceTween *tween = [DanceTween syncTween];
+	tween.completionBlock = block;
+	return tween;
+}
 
 - (float) processDuration:(float)duration {
 	
@@ -40,6 +47,7 @@
 	_progress += duration;
 	if (_progress >= _duration) {
 		_progressRatio = 1;
+		_currentValue = _toValue;
 		return (_progress - _duration);
 	}
 	
