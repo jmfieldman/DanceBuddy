@@ -8,6 +8,11 @@
 
 #import <Foundation/Foundation.h>
 
+typedef struct struct_GLfloatv {
+	GLfloat x;
+	GLfloat y;
+	GLfloat z;
+} __attribute__((__packed__)) GLfloat_v;
 
 typedef struct OGLVBO_Vertex_Position_Texture {
 	GLfloat px;

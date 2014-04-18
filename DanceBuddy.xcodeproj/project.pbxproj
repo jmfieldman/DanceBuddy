@@ -34,6 +34,7 @@
 		353F6C181900448E00074E3E /* DanceSceneView.m in Sources */ = {isa = PBXBuildFile; fileRef = 353F6C171900448E00074E3E /* DanceSceneView.m */; };
 		35D8728719009EE7008D6385 /* DataTypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 35D8728619009EE7008D6385 /* DataTypes.m */; };
 		35D8728A1900B159008D6385 /* SquishyBody.m in Sources */ = {isa = PBXBuildFile; fileRef = 35D872891900B159008D6385 /* SquishyBody.m */; };
+		35D8728D1900C346008D6385 /* GLHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 35D8728C1900C346008D6385 /* GLHelper.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -88,6 +89,8 @@
 		35D8728619009EE7008D6385 /* DataTypes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DataTypes.m; sourceTree = "<group>"; };
 		35D872881900B159008D6385 /* SquishyBody.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SquishyBody.h; sourceTree = "<group>"; };
 		35D872891900B159008D6385 /* SquishyBody.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SquishyBody.m; sourceTree = "<group>"; };
+		35D8728B1900C346008D6385 /* GLHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLHelper.h; sourceTree = "<group>"; };
+		35D8728C1900C346008D6385 /* GLHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GLHelper.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -230,6 +233,8 @@
 				353F6C001900438C00074E3E /* PersistentDictionary.m */,
 				353F6C011900438C00074E3E /* SingletonHelper.h */,
 				353F6C021900438C00074E3E /* SingletonHelper.m */,
+				35D8728B1900C346008D6385 /* GLHelper.h */,
+				35D8728C1900C346008D6385 /* GLHelper.m */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -353,6 +358,7 @@
 				353F6C041900438C00074E3E /* EXRemoteLog.m in Sources */,
 				353F6BD51900421400074E3E /* AppDelegate.m in Sources */,
 				353F6C0A190043E400074E3E /* NS+Hashes.m in Sources */,
+				35D8728D1900C346008D6385 /* GLHelper.m in Sources */,
 				353F6BF7190042DC00074E3E /* MainSceneViewController.m in Sources */,
 				353F6C061900438C00074E3E /* PersistentDictionary.m in Sources */,
 				35D8728719009EE7008D6385 /* DataTypes.m in Sources */,

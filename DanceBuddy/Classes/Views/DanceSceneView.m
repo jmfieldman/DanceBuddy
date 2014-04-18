@@ -7,6 +7,7 @@
 //
 
 #import "DanceSceneView.h"
+#import "SquishyBody.h"
 
 @implementation DanceSceneView
 
@@ -101,7 +102,7 @@
 	
 	/* ------- Drawing -------- */
 	
-
+	[[SquishyBody sharedInstance] renderInGL];
 	
 	/* ------------------------ */
 	

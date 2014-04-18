@@ -28,4 +28,5 @@
 	#import "MathHelper.h"
 	#import "SingletonHelper.h"
 	#import "DataTypes.h"
+	#import "GLHelper.h"
 #endif
