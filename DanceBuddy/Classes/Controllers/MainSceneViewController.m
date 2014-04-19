@@ -59,7 +59,7 @@ SINGLETON_IMPL(MainSceneViewController);
 	
 	[self _frameRateCheckpoint];
 	
-	[_dancer processDuration:timeDiff];
+	[_dancer processDuration:(timeDiff * 129.0/120.0)];
 	[_scene render];
 }
 
