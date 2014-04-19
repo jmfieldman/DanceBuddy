@@ -8,6 +8,7 @@
 
 #import "MainSceneViewController.h"
 
+
 @interface MainSceneViewController ()
 
 @end
@@ -34,8 +35,21 @@ SINGLETON_IMPL(MainSceneViewController);
 		
 		/* Init timeslice */
 		_lastSliceTimestamp = CFAbsoluteTimeGetCurrent();
+		
+						
+		UITapGestureRecognizer *gest = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tapped:)];
+		[_scene addGestureRecognizer:gest];
 	}
 	return self;
+}
+
+- (void) tapped:(UIGestureRecognizer*)g {
+	MPMediaPickerController *pickerController =	[[MPMediaPickerController alloc]
+												 initWithMediaTypes: MPMediaTypeMusic];
+	pickerController.prompt = @"Choose song to export";
+	pickerController.allowsPickingMultipleItems = NO;
+	pickerController.delegate = self;
+	[self presentViewController:pickerController animated:YES completion:nil];
 }
 
 - (void) processTimeslice:(id)sender {
@@ -60,6 +74,24 @@ SINGLETON_IMPL(MainSceneViewController);
 		frames = 0;
 		lasttime = curtime;
 	}
+}
+
+#pragma mark MPMediaPickerControllerDelegate
+
+- (void)mediaPicker: (MPMediaPickerController *)mediaPicker didPickMediaItems:(MPMediaItemCollection *)mediaItemCollection {
+	[self dismissViewControllerAnimated:YES completion:nil];
+	if ([mediaItemCollection count] < 1) {
+		return;
+	}
+	
+	MPMediaItem *song = [[mediaItemCollection items] objectAtIndex:0];
+	static AudioAnalyzer *a = nil;
+	if (!a) a = [[AudioAnalyzer alloc] init];
+	[a convertSong:song];
+}
+
+- (void)mediaPickerDidCancel:(MPMediaPickerController *)mediaPicker {
+	[self dismissViewControllerAnimated:YES completion:nil];
 }
 
 @end

@@ -10,7 +10,7 @@
 #import "DanceSceneView.h"
 #import "SquishyBody.h"
 
-@interface MainSceneViewController : UIViewController {
+@interface MainSceneViewController : UIViewController <MPMediaPickerControllerDelegate> {
 	/* Animation Timer */
 	CADisplayLink  *_displayLink;
 	double          _lastSliceTimestamp;

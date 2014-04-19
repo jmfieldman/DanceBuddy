@@ -37,6 +37,10 @@
 		35D8728D1900C346008D6385 /* GLHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 35D8728C1900C346008D6385 /* GLHelper.m */; };
 		35D872901901D23D008D6385 /* DanceTween.m in Sources */ = {isa = PBXBuildFile; fileRef = 35D8728F1901D23D008D6385 /* DanceTween.m */; };
 		35D872931901D45D008D6385 /* TweeningQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = 35D872921901D45D008D6385 /* TweeningQueue.m */; };
+		35E521081901FEF100A841DC /* aubio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35E521071901FEF100A841DC /* aubio.framework */; };
+		35E5210A1902008600A841DC /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35E521091902008600A841DC /* Accelerate.framework */; };
+		35E5210D1902055400A841DC /* AudioAnalyzer.m in Sources */ = {isa = PBXBuildFile; fileRef = 35E5210C1902055400A841DC /* AudioAnalyzer.m */; };
+		35E5210F1902078D00A841DC /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 35E5210E1902078D00A841DC /* MediaPlayer.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -97,6 +101,11 @@
 		35D8728F1901D23D008D6385 /* DanceTween.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DanceTween.m; sourceTree = "<group>"; };
 		35D872911901D45D008D6385 /* TweeningQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TweeningQueue.h; sourceTree = "<group>"; };
 		35D872921901D45D008D6385 /* TweeningQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TweeningQueue.m; sourceTree = "<group>"; };
+		35E521071901FEF100A841DC /* aubio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = aubio.framework; sourceTree = "<group>"; };
+		35E521091902008600A841DC /* Accelerate.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Accelerate.framework; path = System/Library/Frameworks/Accelerate.framework; sourceTree = SDKROOT; };
+		35E5210B1902055400A841DC /* AudioAnalyzer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AudioAnalyzer.h; sourceTree = "<group>"; };
+		35E5210C1902055400A841DC /* AudioAnalyzer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AudioAnalyzer.m; sourceTree = "<group>"; };
+		35E5210E1902078D00A841DC /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -104,7 +113,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				35E5210F1902078D00A841DC /* MediaPlayer.framework in Frameworks */,
+				35E5210A1902008600A841DC /* Accelerate.framework in Frameworks */,
 				353F6C141900442B00074E3E /* StoreKit.framework in Frameworks */,
+				35E521081901FEF100A841DC /* aubio.framework in Frameworks */,
 				353F6C0F1900441200074E3E /* AVFoundation.framework in Frameworks */,
 				353F6C101900441200074E3E /* GameKit.framework in Frameworks */,
 				353F6C111900441200074E3E /* OpenGLES.framework in Frameworks */,
@@ -150,6 +162,8 @@
 		353F6BC31900421400074E3E /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				35E5210E1902078D00A841DC /* MediaPlayer.framework */,
+				35E521091902008600A841DC /* Accelerate.framework */,
 				353F6C131900442B00074E3E /* StoreKit.framework */,
 				353F6C0B1900441200074E3E /* AVFoundation.framework */,
 				353F6C0C1900441200074E3E /* GameKit.framework */,
@@ -166,6 +180,7 @@
 		353F6BCA1900421400074E3E /* DanceBuddy */ = {
 			isa = PBXGroup;
 			children = (
+				35D872941901F0B1008D6385 /* External */,
 				353F6BF3190042C200074E3E /* Classes */,
 				353F6BD31900421400074E3E /* AppDelegate.h */,
 				353F6BD41900421400074E3E /* AppDelegate.m */,
@@ -241,6 +256,8 @@
 				353F6C021900438C00074E3E /* SingletonHelper.m */,
 				35D8728B1900C346008D6385 /* GLHelper.h */,
 				35D8728C1900C346008D6385 /* GLHelper.m */,
+				35E5210B1902055400A841DC /* AudioAnalyzer.h */,
+				35E5210C1902055400A841DC /* AudioAnalyzer.m */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -267,6 +284,22 @@
 				35D872921901D45D008D6385 /* TweeningQueue.m */,
 			);
 			path = Models;
+			sourceTree = "<group>";
+		};
+		35D872941901F0B1008D6385 /* External */ = {
+			isa = PBXGroup;
+			children = (
+				35E521061901FEF100A841DC /* Aubio */,
+			);
+			path = External;
+			sourceTree = "<group>";
+		};
+		35E521061901FEF100A841DC /* Aubio */ = {
+			isa = PBXGroup;
+			children = (
+				35E521071901FEF100A841DC /* aubio.framework */,
+			);
+			path = Aubio;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -366,6 +399,7 @@
 			files = (
 				353F6C031900438C00074E3E /* EXDebug.m in Sources */,
 				353F6C041900438C00074E3E /* EXRemoteLog.m in Sources */,
+				35E5210D1902055400A841DC /* AudioAnalyzer.m in Sources */,
 				353F6BD51900421400074E3E /* AppDelegate.m in Sources */,
 				353F6C0A190043E400074E3E /* NS+Hashes.m in Sources */,
 				35D8728D1900C346008D6385 /* GLHelper.m in Sources */,
@@ -495,6 +529,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/DanceBuddy/External/Aubio",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "DanceBuddy/DanceBuddy-Prefix.pch";
 				INFOPLIST_FILE = "DanceBuddy/DanceBuddy-Info.plist";
@@ -510,6 +548,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/DanceBuddy/External/Aubio",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "DanceBuddy/DanceBuddy-Prefix.pch";
 				INFOPLIST_FILE = "DanceBuddy/DanceBuddy-Info.plist";
